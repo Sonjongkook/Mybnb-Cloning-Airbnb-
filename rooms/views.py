@@ -1,25 +1,21 @@
-from math import ceil
-from django.shortcuts import render
-from django.core.paginator import Paginator
+from django.utils import timezone
+from django.views.generic import ListView
 from . import models
+from django.shortcuts import render
 
 
-def all_rooms(request):
-    page = request.GET.get("page", 1)
-    page = int(page or 1)
-    page_size = 10
-    limit = page_size * page
-    offset = limit - page_size
-    all_rooms = models.Room.objects.all()[offset:limit]
-    page_count = ceil(models.Room.objects.count() / page_size)
-    return render(
-        request,
-        "rooms/home.html",
-        {
-            "rooms": all_rooms,
-            "page": page,
-            "page_count": page_count,
-            "page_range": range(1, page_count),
-        },
-    )
+class HomeView(ListView):
+    # Home view definition
+    model = models.Room
+    paginate_by = 10	
+    ordering = "created"
+    paginate_orphans = 5	
+    page_kwarg = 'page'	
+    context_object_name = "rooms"
+
+
+def room_detail(request, pk):
+    print(pk)
+
+    return render(request, "rooms/detail.html")
 
